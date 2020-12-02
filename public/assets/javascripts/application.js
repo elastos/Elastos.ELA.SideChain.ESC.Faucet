@@ -28,7 +28,7 @@ $(function() {
 			$("#receiver").val('');
 			loader.addClass("hidden");
 			swal("Success",
-			  `1 ETH has been successfully transferred to <a href="https://testnet.elaeth.io/tx/${data.success.txHash}" target="blank">${receiver}`,
+			  `1 ETH has been successfully transferred to <a href="https://eth-testnet.elastos.io/tx/${data.success.txHash}" target="blank">${receiver}`,
 			  "success"
 			);
 		}).fail(function(err) {
