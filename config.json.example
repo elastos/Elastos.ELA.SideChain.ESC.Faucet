@@ -5,12 +5,12 @@
     "secret": "secret"
   },
   "Ethereum": {
-    "milliEtherToTransfer": 500,
+    "milliEtherToTransfer": 1000,
     "gasLimit": "21000",
     "prod": {
       "rpc": "http://127.0.0.1:8545",
-      "account": "privateKey",
-      "privateKey": "privateKey"
+      "account": "The address from which the funds will be drained",
+      "privateKey": "Private key of the account"
     }
   }
 }
