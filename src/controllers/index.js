@@ -73,7 +73,7 @@ module.exports = function (app) {
 			return generateErrorResponse(response, {message: messages.INVALID_ADDRESS})
 		}
 		
-		const gasPrice = web3.utils.toWei('1', 'gwei')
+		const gasPrice = web3.utils.toWei('50', 'gwei')
 		const gasPriceHex = web3.utils.toHex(gasPrice)
 		const gasLimitHex = web3.utils.toHex(config.Ethereum.gasLimit)
 		const nonce = await web3.eth.getTransactionCount(config.Ethereum[config.environment].account)
@@ -86,7 +86,7 @@ module.exports = function (app) {
 		  gasLimit: gasLimitHex,
 		  to: receiver, 
 		  value: ethToSend,
-		  data: '0x00'
+		  data: ''
 		}
 
 		const tx = new EthereumTx(rawTx)
