@@ -31,7 +31,7 @@ app.configureWeb3(config)
 	require('./src/controllers/index')(app)
 
 	app.get('/', function(request, response) {
-	  response.send('Elastos Smart Contract Network Faucet')
+	  response.send('Elastos EID Network Faucet')
 	});
 
 	app.set('port', (process.env.PORT || 8080))

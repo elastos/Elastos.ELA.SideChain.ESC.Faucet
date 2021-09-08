@@ -22,7 +22,7 @@ $(function() {
 			$("#receiver").val('');
 			loader.addClass("hidden");
 			swal("Success",
-			  `1 ESC has been successfully transferred to <a href="https://esc-testnet.elastos.io/tx/${data.success.txHash}" target="blank">${receiver}`,
+			  `1 EID has been successfully transferred to <a href="https://eid-testnet.elastos.io/tx/${data.success.txHash}" target="blank">${receiver}`,
 			  "success"
 			);
 		}).fail(function(err) {
