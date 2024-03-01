@@ -35,7 +35,7 @@ module.exports = function (app) {
 		const receiver = request.body.receiver
 		const network = request.body.network
 		if (await validateCaptchaResponse(captchaResponse, receiver, response)) {
-			await sendPOAToRecipient(web3, receiver, response, isDebug)
+			await sendPOAToRecipient(web3, receiver, response, isDebug, network)
 		}
 	});
 
