@@ -34,7 +34,7 @@ app.configureWeb3(config)
 	  response.send('Elastos Faucet')
 	});
 
-	app.set('port', (process.env.PORT || 8080))
+	app.set('port', (process.env.PORT || 8081))
 
 	app.listen(app.get('port'), function () {
 	    console.log('Sokol testnet POA Network faucet is running on port', app.get('port'))
