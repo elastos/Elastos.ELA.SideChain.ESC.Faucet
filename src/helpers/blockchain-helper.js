@@ -5,15 +5,20 @@ module.exports = function (app) {
  
 	function configureWeb3 (config) {
 		return new Promise((resolve, reject) => {
-			let web3
-			if (typeof web3 !== 'undefined') {
-				web3 = new Web3(web3.currentProvider)
-			}
-			else {
-				web3 = new Web3(new Web3.providers.HttpProvider(config.Ethereum[config.environment].rpc))
+			let web3 = {};
+			if (typeof web3['ESC'] !== 'undefined') {
+				web3.ESC = new Web3(web3.currentProvider)
+			} else {
+				web3.ESC = new Web3(new Web3.providers.HttpProvider(config.Ethereum['ESC'][config.environment].rpc))
 			}
 
-			if (typeof web3 !== 'undefined') {
+			if (typeof web3['EID'] !== 'undefined') {
+				web3.EID = new Web3(web3.currentProvider)
+			} else {
+				web3.EID = new Web3(new Web3.providers.HttpProvider(config.Ethereum['EID'][config.environment].rpc))
+			}
+
+			if (typeof web3['ESC'] !== 'undefined' && typeof web3['EID'] !== 'undefined') {
 				return resolve(web3)
 			}
 			

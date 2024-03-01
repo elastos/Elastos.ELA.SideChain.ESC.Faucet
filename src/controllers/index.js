@@ -33,6 +33,7 @@ module.exports = function (app) {
 			return generateErrorResponse(response, e)
 		}
 		const receiver = request.body.receiver
+		const network = request.body.network
 		if (await validateCaptchaResponse(captchaResponse, receiver, response)) {
 			await sendPOAToRecipient(web3, receiver, response, isDebug)
 		}
@@ -41,10 +42,10 @@ module.exports = function (app) {
 	app.get('/health', async function(request, response) {
 		let balanceInWei
 		let balanceInEth
-		const address = config.Ethereum[config.environment].account
+		const address = config.Ethereum['ESC'][config.environment].account
 		try {
-			balanceInWei = await web3.eth.getBalance(address)
-			balanceInEth = await web3.utils.fromWei(balanceInWei, "ether")
+			balanceInWei = await web3.ESC.eth.getBalance(address)
+			balanceInEth = await web3.ESC.utils.fromWei(balanceInWei, "ether")
 		} catch (error) {
 			return generateErrorResponse(response, error)
 		}
@@ -66,53 +67,58 @@ module.exports = function (app) {
 		return true
 	}
 
-	async function sendPOAToRecipient(web3, receiver, response, isDebug) {
-		let senderPrivateKey = config.Ethereum[config.environment].privateKey
-		const privateKeyHex = Buffer.from(senderPrivateKey, 'hex')
-		if (!web3.utils.isAddress(receiver)) {
-			return generateErrorResponse(response, {message: messages.INVALID_ADDRESS})
-		}
-		
-		const gasPrice = web3.utils.toWei('50', 'gwei')
-		const gasPriceHex = web3.utils.toHex(gasPrice)
-		const gasLimitHex = web3.utils.toHex(config.Ethereum.gasLimit)
-		const nonce = await web3.eth.getTransactionCount(config.Ethereum[config.environment].account)
-		const nonceHex = web3.utils.toHex(nonce)
-		const BN = web3.utils.BN
-		const ethToSend = web3.utils.toWei(new BN(config.Ethereum.milliEtherToTransfer), "milliether")
-		const rawTx = {
-		  nonce: nonceHex,
-		  gasPrice: gasPriceHex,
-		  gasLimit: gasLimitHex,
-		  to: receiver, 
-		  value: ethToSend,
-		  data: ''
-		}
+	async function sendPOAToRecipient(web3, receiver, response, isDebug, network) {
 
-		const tx = new EthereumTx(rawTx)
-		tx.sign(privateKeyHex)
-
-		const serializedTx = tx.serialize()
-
-		let txHash
-		web3.eth.sendSignedTransaction("0x" + serializedTx.toString('hex'))
-		.on('transactionHash', (_txHash) => {
-			txHash = _txHash
-		})
-		.on('receipt', (receipt) => {
-			debug(isDebug, receipt)
-			if (receipt.status == '0x1') {
-				return sendRawTransactionResponse(txHash, response)
-			} else {
-				const error = {
-					message: messages.TX_HAS_BEEN_MINED_WITH_FALSE_STATUS,
-				}
-				return generateErrorResponse(response, error);
+		if(network !== 'ELA') {
+			let senderPrivateKey = config.Ethereum[network][config.environment].privateKey
+			const privateKeyHex = Buffer.from(senderPrivateKey, 'hex')
+			if (!web3[network].utils.isAddress(receiver)) {
+				return generateErrorResponse(response, {message: messages.INVALID_ADDRESS})
 			}
-		})
-		.on('error', (error) => {
-			return generateErrorResponse(response, error)
-		});
+
+			const gasPrice = web3[network].utils.toWei('50', 'gwei')
+			const gasPriceHex = web3[network].utils.toHex(gasPrice)
+			const gasLimitHex = web3[network].utils.toHex(config.Ethereum[network].gasLimit)
+			const nonce = await web3[network].eth.getTransactionCount(config.Ethereum[network][config.environment].account)
+			const nonceHex = web3[network].utils.toHex(nonce)
+			const BN = web3[network].utils.BN
+			const ethToSend = web3[network].utils.toWei(new BN(config.Ethereum[network].milliEtherToTransfer), "milliether")
+			const rawTx = {
+				nonce: nonceHex,
+				gasPrice: gasPriceHex,
+				gasLimit: gasLimitHex,
+				to: receiver,
+				value: ethToSend,
+				data: ''
+			}
+
+			const tx = new EthereumTx(rawTx)
+			tx.sign(privateKeyHex)
+
+			const serializedTx = tx.serialize()
+
+			let txHash
+			web3[network].eth.sendSignedTransaction("0x" + serializedTx.toString('hex'))
+				.on('transactionHash', (_txHash) => {
+					txHash = _txHash
+				})
+				.on('receipt', (receipt) => {
+					debug(isDebug, receipt)
+					if (receipt.status == '0x1') {
+						return sendRawTransactionResponse(txHash, response)
+					} else {
+						const error = {
+							message: messages.TX_HAS_BEEN_MINED_WITH_FALSE_STATUS,
+						}
+						return generateErrorResponse(response, error);
+					}
+				})
+				.on('error', (error) => {
+					return generateErrorResponse(response, error)
+				});
+		} else {
+
+		}
 	}
 
 	function sendRawTransactionResponse(txHash, response) {

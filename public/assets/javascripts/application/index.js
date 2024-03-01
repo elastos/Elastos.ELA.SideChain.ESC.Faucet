@@ -1,14 +1,20 @@
 $(function() {
+	$("#network").on('change', (event) => {
+		let networkType = $(event.target).val();
+		$("#requestTokens").text(`Request 1 ${networkType}`);
+		$("#network-type").val(networkType);
+	})
+
 	var loader = $(".loading-container");
 	$( "#faucetForm" ).submit(function( e ) {
 		e.preventDefault();
-    	$this = $(this);
+		$this = $(this);
 		loader.removeClass("hidden");
 		var receiver = $("#receiver").val();
 		$.ajax({
-		  	url:"/",
-		  	type:"POST",
-		  	data: $this.serialize()
+			url:"/",
+			type:"POST",
+			data: $this.serialize()
 		}).done(function(data) {
 			grecaptcha.reset();
 			if (!data.success) {
@@ -22,8 +28,8 @@ $(function() {
 			$("#receiver").val('');
 			loader.addClass("hidden");
 			swal("Success",
-			  `1 ESC has been successfully transferred to <a href="https://esc-testnet.elastos.io/tx/${data.success.txHash}" target="blank">${receiver}`,
-			  "success"
+				`1 ESC has been successfully transferred to <a href="https://esc-testnet.elastos.io/tx/${data.success.txHash}" target="blank">${receiver}`,
+				"success"
 			);
 		}).fail(function(err) {
 			grecaptcha.reset();

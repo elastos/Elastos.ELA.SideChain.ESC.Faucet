@@ -19,13 +19,17 @@
     <section class="content">
       <form action="/" method="POST" id="faucetForm">
         <div class="request-tokens">
-          <h1>Elastos Smart Contract Network Faucet</h1>
-            <input type="text" id="receiver" name="receiver" />
-            <h2>
-              Please use Elastos Smart Contract RPC to connect<br>
-              to the  testnet.
-            </h2>
-            <button type="submit" id="requestTokens" class="request-tokens-button">Request 1 ESC</button>
+          <h1>Elastos Faucet</h1>
+          <label for="receiver">
+            <select style="width: 15%; margin: 20px 0; height: 30px; border-radius: 3px; box-sizing: border-box; border: 1px solid #eee;" id="network">
+              <option>ELA</option>
+              <option>ESC</option>
+              <option>EID</option>
+            </select>
+          </label>
+          <input type="text" id="receiver" name="receiver" placeholder="Please input your address here" />
+          <button type="submit" id="requestTokens" class="request-tokens-button">Request 1 ELA</button>
+          <label for="network-type"></label><input hidden="hidden" id="network-type" name="network" value="ELA">
         </div>
         <div class="text-xs-center">
           <div class="g-recaptcha" data-sitekey="6Lc82ewZAAAAAKv7DysVtR7cL7IO-2PTYlywUwvc"></div>

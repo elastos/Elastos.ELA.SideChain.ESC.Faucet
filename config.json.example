@@ -5,12 +5,24 @@
     "secret": "secret"
   },
   "Ethereum": {
-    "milliEtherToTransfer": 1000,
-    "gasLimit": "21000",
-    "prod": {
-      "rpc": "http://127.0.0.1:8545",
-      "account": "The address from which the funds will be drained",
-      "privateKey": "Private key of the account"
+    "ESC": {
+        "milliEtherToTransfer": 1000,
+        "gasLimit": "21000",
+        "prod": {
+          "rpc": "http://127.0.0.1:8545",
+          "account": "The address from which the funds will be drained",
+          "privateKey": "Private key of the account"
+        }
+    },
+
+    "EID": {
+        "milliEtherToTransfer": 1000,
+        "gasLimit": "21000",
+        "prod": {
+          "rpc": "http://127.0.0.1:8545",
+          "account": "The address from which the funds will be drained",
+          "privateKey": "Private key of the account"
+        }
     }
   }
 }
