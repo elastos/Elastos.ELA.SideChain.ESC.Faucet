@@ -6,11 +6,13 @@
   },
   "Ethereum": {
     "ELA": {
-        "fee": 0.005,
+        "fee": 100000,
+        "masterWalletId": "faucet-master-wallet-1",
+        "masterWalletPass": "12345678",
         "prod": {
           "rpc": "https://api-testnet.elastos.io/ela",
           "account": "The address from which the funds will be drained",
-          "privateKey": "Private key of the account"
+          "mnemonic": "Private key of the account"
         }
     },
     "ESC": {

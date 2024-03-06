@@ -71,8 +71,6 @@ module.exports = function (app) {
 	async function sendPOAToRecipient(web3, receiver, response, isDebug, network) {
 
 		if(network !== 'ELA') {
-			let senderPrivateKey = config.Ethereum[network][config.environment].privateKey
-			const privateKeyHex = Buffer.from(senderPrivateKey, 'hex')
 			if (!web3[network].utils.isAddress(receiver)) {
 				return generateErrorResponse(response, {message: messages.INVALID_ADDRESS})
 			}
@@ -92,6 +90,9 @@ module.exports = function (app) {
 				value: ethToSend,
 				data: ''
 			}
+
+			let senderPrivateKey = config.Ethereum[network][config.environment].privateKey
+			const privateKeyHex = Buffer.from(senderPrivateKey, 'hex')
 
 			const tx = new EthereumTx(rawTx)
 			tx.sign(privateKeyHex)
@@ -118,7 +119,11 @@ module.exports = function (app) {
 					return generateErrorResponse(response, error)
 				});
 		} else {
-
+			sendELA(receiver, isDebug).then(txHash => {
+				return sendRawTransactionResponse(txHash, response)
+			}).catch(error => {
+				return generateErrorResponse(response, error)
+			})
 		}
 	}
 
@@ -135,30 +140,40 @@ module.exports = function (app) {
 	  	})
 	}
 
-	async function sendELA(receiver){
+	async function sendELA(receiver, isDebug){
 		let address = config.Ethereum.ELA[config.environment].account;
 		let url = config.Ethereum.ELA[config.environment].rpc;
-		let privateKey = config.Ethereum.ELA[config.environment].privateKey;
 		let fee = config.Ethereum.ELA.fee;
 
-		let responseUTXO = await axios.post(rpc, {"method": "getutxosbyamount","params":{"address": address,"amount": "1"}});
+		try {
+			let responseUTXO = await axios.post(url, {"method": "getutxosbyamount","params":{"address": address,"amount": "1"}});
 
-		let availableUTXO = responseUTXO.data.result[0];
-		let amount = parseFloat(availableUTXO.amount);
-		let inputs = `[{"txid": "${availableUTXO.txid}", "vout": ${availableUTXO.vout}}]`
-		let outputs = `[{"address": ${receiver}, "amount": 1}, {"address": ${address}, "amount": ${amount - 1 - fee}}]`
+			let availableUTXO = responseUTXO.data.result[0];
+			let amount = parseFloat(availableUTXO.amount) * 100000000;
+			let balance = amount - 100000000 - fee;
+			let inputs = [{TxHash: availableUTXO.txid, Index: availableUTXO.vout, Address: availableUTXO.address, Amount: amount.toString()}]
+			let outputs = [{Address: receiver, Amount: "100000000"},{Address: address, Amount: balance.toString()}]
 
-		let responseTx = await axios(
-			{
-				method: 'post',
-				url,
-				data: JSON.stringify({method: "createrawtransaction", params:{inputs: inputs, outputs: outputs, locktime: 0}}),
-				headers: {
-					'content-Type': 'application/json'
+			let encodedTx = app.subWallet.createTransaction(inputs, outputs, "100000", "");
+			let result = await app.subWallet.signTransaction(encodedTx, "12345678");
+			let rawTx = app.subWallet.convertToRawTransaction(result);
+
+			let responseSendTx = await axios(
+				{
+					method: 'post',
+					url,
+					data: {"method": "sendrawtransaction", "params": [rawTx]},
+					headers: {
+						'content-Type': 'application/json'
+					}
 				}
-			}
-		)
+			);
 
-		let result = sign(responseTx.data.result, privateKey);
+			debug(isDebug, responseSendTx.data)
+			return responseSendTx.data.result;
+		} catch (error) {
+			console.log(error);
+			return null;
+		}
 	}
 }

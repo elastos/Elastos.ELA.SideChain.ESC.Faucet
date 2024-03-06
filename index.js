@@ -15,31 +15,36 @@ if (configExists) {
 }
 app.config = config
 
-let web3
-app.configureWeb3(config)
-.then(web3 => {
-	app.web3 = web3
-	app.use(express.static(__dirname + '/public'))
-	app.use(bodyParser.json({
-		limit: '50mb',
-	}))
-	app.use(bodyParser.urlencoded({
-		limit: '50mb',
-		extended: true,
-	}))
+app.configureELAWallet(config).then(subWallet => {
+	app.subWallet = subWallet;
 
-	require('./src/controllers/index')(app)
+	app.configureWeb3(config)
+		.then(web3 => {
+			app.web3 = web3
+			app.use(express.static(__dirname + '/public'))
+			app.use(bodyParser.json({
+				limit: '50mb',
+			}))
+			app.use(bodyParser.urlencoded({
+				limit: '50mb',
+				extended: true,
+			}))
 
-	app.get('/', function(request, response) {
-	  response.send('Elastos Faucet')
-	});
+			require('./src/controllers/index')(app)
 
-	app.set('port', (process.env.PORT || 8081))
+			app.get('/', function(request, response) {
+				response.send('Elastos Faucet')
+			});
 
-	app.listen(app.get('port'), function () {
-	    console.log('Sokol testnet POA Network faucet is running on port', app.get('port'))
-	})
-})
-.catch(error => {
+			app.set('port', (process.env.PORT || 8081))
+
+			app.listen(app.get('port'), function () {
+				console.log('Sokol testnet POA Network faucet is running on port', app.get('port'))
+			})
+		})
+		.catch(error => {
+			return console.log(error)
+		})
+}).catch(error => {
 	return console.log(error)
 })
