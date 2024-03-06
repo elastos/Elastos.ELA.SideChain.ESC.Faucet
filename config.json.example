@@ -5,11 +5,19 @@
     "secret": "secret"
   },
   "Ethereum": {
+    "ELA": {
+        "fee": 0.005,
+        "prod": {
+          "rpc": "https://api-testnet.elastos.io/ela",
+          "account": "The address from which the funds will be drained",
+          "privateKey": "Private key of the account"
+        }
+    },
     "ESC": {
         "milliEtherToTransfer": 1000,
         "gasLimit": "21000",
         "prod": {
-          "rpc": "http://127.0.0.1:8545",
+          "rpc": "https://api-testnet.elastos.io/esc",
           "account": "The address from which the funds will be drained",
           "privateKey": "Private key of the account"
         }
@@ -19,7 +27,7 @@
         "milliEtherToTransfer": 1000,
         "gasLimit": "21000",
         "prod": {
-          "rpc": "http://127.0.0.1:8545",
+          "rpc": "https://api-testnet.elastos.io/eid",
           "account": "The address from which the funds will be drained",
           "privateKey": "Private key of the account"
         }

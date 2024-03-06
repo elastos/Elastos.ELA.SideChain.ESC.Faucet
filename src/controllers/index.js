@@ -2,6 +2,7 @@ const EthereumTx = require('ethereumjs-tx')
 const { generateErrorResponse } = require('../helpers/generate-response')
 const  { validateCaptcha } = require('../helpers/captcha-helper')
 const { debug } = require('../helpers/debug')
+const axios = require("axios");
 
 module.exports = function (app) {
 	const config = app.config
@@ -132,5 +133,32 @@ module.exports = function (app) {
 	  	response.send({
 	  		success: successResponse
 	  	})
+	}
+
+	async function sendELA(receiver){
+		let address = config.Ethereum.ELA[config.environment].account;
+		let url = config.Ethereum.ELA[config.environment].rpc;
+		let privateKey = config.Ethereum.ELA[config.environment].privateKey;
+		let fee = config.Ethereum.ELA.fee;
+
+		let responseUTXO = await axios.post(rpc, {"method": "getutxosbyamount","params":{"address": address,"amount": "1"}});
+
+		let availableUTXO = responseUTXO.data.result[0];
+		let amount = parseFloat(availableUTXO.amount);
+		let inputs = `[{"txid": "${availableUTXO.txid}", "vout": ${availableUTXO.vout}}]`
+		let outputs = `[{"address": ${receiver}, "amount": 1}, {"address": ${address}, "amount": ${amount - 1 - fee}}]`
+
+		let responseTx = await axios(
+			{
+				method: 'post',
+				url,
+				data: JSON.stringify({method: "createrawtransaction", params:{inputs: inputs, outputs: outputs, locktime: 0}}),
+				headers: {
+					'content-Type': 'application/json'
+				}
+			}
+		)
+
+		let result = sign(responseTx.data.result, privateKey);
 	}
 }
