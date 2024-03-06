@@ -1,6 +1,13 @@
 $(function() {
+	const networkExplorerMap = {
+		'ESC': 'https://esc-testnet.elastos.io/tx/',
+		'EID': 'https://eid-testnet.elastos.io/tx/',
+	}
+
+	let networkType = 'ELA';
+
 	$("#network").on('change', (event) => {
-		let networkType = $(event.target).val();
+		networkType = $(event.target).val();
 		$("#requestTokens").text(`Request 1 ${networkType}`);
 		$("#network-type").val(networkType);
 	})
@@ -28,7 +35,8 @@ $(function() {
 			$("#receiver").val('');
 			loader.addClass("hidden");
 			swal("Success",
-				`1 ESC has been successfully transferred to <a href="https://esc-testnet.elastos.io/tx/${data.success.txHash}" target="blank">${receiver}`,
+				networkType === 'ELA' ? `1 ELA has been send to ${receiver}, Please check in a few minutes.`
+					: `1 ${networkType} has been successfully transferred to <a href="${networkExplorerMap[networkType]}${data.success.txHash}" target="blank">${receiver}`,
 				"success"
 			);
 		}).fail(function(err) {

@@ -4,6 +4,8 @@ const  { validateCaptcha } = require('../helpers/captcha-helper')
 const { debug } = require('../helpers/debug')
 const axios = require("axios");
 
+const SELA = 100000000;
+
 module.exports = function (app) {
 	const config = app.config
 	const web3 = app.web3
@@ -142,38 +144,39 @@ module.exports = function (app) {
 
 	async function sendELA(receiver, isDebug){
 		let address = config.Ethereum.ELA[config.environment].account;
+		let masterWalletPass = config.Ethereum.ELA.masterWalletPass;
 		let url = config.Ethereum.ELA[config.environment].rpc;
-		let fee = config.Ethereum.ELA.fee;
+		let fee = parseInt(config.Ethereum.ELA.fee);
 
-		try {
-			let responseUTXO = await axios.post(url, {"method": "getutxosbyamount","params":{"address": address,"amount": "1"}});
+		let responseUTXO = await axios.post(url, {"method": "getutxosbyamount","params":{"address": address,"amount": "1", "utxotype": "normal"}});
 
-			let availableUTXO = responseUTXO.data.result[0];
-			let amount = parseFloat(availableUTXO.amount) * 100000000;
-			let balance = amount - 100000000 - fee;
-			let inputs = [{TxHash: availableUTXO.txid, Index: availableUTXO.vout, Address: availableUTXO.address, Amount: amount.toString()}]
-			let outputs = [{Address: receiver, Amount: "100000000"},{Address: address, Amount: balance.toString()}]
-
-			let encodedTx = app.subWallet.createTransaction(inputs, outputs, "100000", "");
-			let result = await app.subWallet.signTransaction(encodedTx, "12345678");
-			let rawTx = app.subWallet.convertToRawTransaction(result);
-
-			let responseSendTx = await axios(
-				{
-					method: 'post',
-					url,
-					data: {"method": "sendrawtransaction", "params": [rawTx]},
-					headers: {
-						'content-Type': 'application/json'
-					}
-				}
-			);
-
-			debug(isDebug, responseSendTx.data)
-			return responseSendTx.data.result;
-		} catch (error) {
-			console.log(error);
-			return null;
+		let availableUTXOs = responseUTXO.data.result;
+		let inputs = [];
+		let totalAmount = 0;
+		for(let availableUTXO of availableUTXOs) {
+			let amount = parseFloat(availableUTXO.amount) * SELA;
+			totalAmount += amount;
+			inputs.push({TxHash: availableUTXO.txid, Index: availableUTXO.vout, Address: availableUTXO.address, Amount: amount.toString()});
 		}
+		let balanceAmount = totalAmount - SELA - fee;
+		let outputs = [{Address: receiver, Amount: SELA.toString()},{Address: address, Amount: balanceAmount.toString()}]
+
+		let encodedTx = app.subWallet.createTransaction(inputs, outputs, fee, "");
+		let result = await app.subWallet.signTransaction(encodedTx, masterWalletPass);
+		let rawTx = app.subWallet.convertToRawTransaction(result);
+
+		let responseSendTx = await axios(
+			{
+				method: 'post',
+				url,
+				data: {"method": "sendrawtransaction", "params": [rawTx]},
+				headers: {
+					'content-Type': 'application/json'
+				}
+			}
+		);
+
+		debug(isDebug, responseSendTx.data)
+		return responseSendTx.data.result;
 	}
 }
