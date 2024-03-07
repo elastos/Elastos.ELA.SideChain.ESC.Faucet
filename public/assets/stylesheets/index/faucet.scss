@@ -14,6 +14,7 @@
   @extend %item;
   padding: 30px;
   display: inline-block;
+  width: 425px;
 
   h1 {
     @extend %title;

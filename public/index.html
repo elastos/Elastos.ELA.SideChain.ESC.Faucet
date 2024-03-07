@@ -28,7 +28,8 @@
             </select>
           </label>
           <input type="text" id="receiver" name="receiver" placeholder="Please input your address here" />
-          <button type="submit" id="requestTokens" class="request-tokens-button">Request 1 ELA</button>
+          <p style="color: red" id="address-warn" hidden="hidden">Invalid address</p>
+          <button type="submit" id="requestTokens" class="request-tokens-button" disabled>Request 1 ELA</button>
           <label for="network-type"></label><input hidden="hidden" id="network-type" name="network" value="ELA">
         </div>
         <div class="text-xs-center">

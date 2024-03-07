@@ -23,6 +23,7 @@
   text-decoration: none;
   text-transform: uppercase;
   font-weight: bold;
+  margin-top: 20px;
 
   &:hover {
     background-color: #20bdf7;
@@ -36,6 +37,13 @@
   &-vote {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAASCAMAAAB2Mu6sAAAAgVBMVEX///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+xZKUEAAAAKnRSTlMAAQIDPVBWYmNkZmpxeHp7fIOEhYaHiZeZmp6foKGio6TV2dze5unx9f63Mu9fAAAAgElEQVR4AXXO1w7CMBSD4VM2lFE2lD0I1O//gIBrCUUn/Hf5rCixRI3V695KeLMEcEn4Dp+C9z2+DZ0f6IXz4x8/0Sf63c/P9DEP7fDM5VkpZw8Ao9rX9JnVBWjJNvSlqW7F67GzAZdiS1+QooXNLaqvRe/6ZWquXuVcdW7XPJY3R9MVHwqyyb8AAAAASUVORK5CYII=);
     background-size: 12px 9px;
+  }
+
+  &:disabled {
+    background-color: gray;
+    &:hover {
+      background-color: gray;
+    }
   }
 }
 

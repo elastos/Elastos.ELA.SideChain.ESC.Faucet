@@ -10,6 +10,35 @@ $(function() {
 		networkType = $(event.target).val();
 		$("#requestTokens").text(`Request 1 ${networkType}`);
 		$("#network-type").val(networkType);
+
+		$("#receiver").trigger('input');
+	})
+
+	$("#receiver").on('input', (event) => {
+		let warn = $("#address-warn");
+		let inputValue = $("#receiver").val();
+		let button = $("#requestTokens");
+		if(inputValue === "") {
+			!warn.attr('hidden') && warn.attr('hidden', 'hidden');
+			return;
+		}
+
+		if(networkType === 'ELA') {
+			if(!inputValue.startsWith('E') || inputValue.length !== 34) {
+				button.prop('disabled', true);
+				warn.removeAttr("hidden");
+				return;
+			}
+		} else {
+			if(!inputValue.startsWith('0x') || inputValue.length !== 42) {
+				button.prop('disabled', true);
+				warn.removeAttr("hidden");
+				return;
+			}
+		}
+
+		warn.attr('hidden', 'hidden');
+		button.removeAttr('disabled');
 	})
 
 	var loader = $(".loading-container");
