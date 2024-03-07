@@ -68,6 +68,7 @@ $(function() {
 			}
 
 			$("#receiver").val('');
+			$("#requestTokens").prop('disabled', true);
 			loader.addClass("hidden");
 			swal("Success",
 				networkType === 'ELA' ? `1 ELA has been send to ${receiver}, Please check in a few minutes.`
