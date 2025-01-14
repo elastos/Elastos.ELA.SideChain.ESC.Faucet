@@ -5,8 +5,20 @@ $(function() {
 	}
 
 	let networkType = 'ELA';
+	const queryString = window.location.search;
+	const urlParams = new URLSearchParams(queryString);
+	let network = urlParams.get('chain');
+	if(network === "esc") {
+		networkType = 'ESC'
+	} else if(network === 'eid') {
+		networkType = 'EID'
+	}
 
-	$("#network").on('change', (event) => {
+	let networkSelector = $("#network");
+	networkSelector.val(networkType);
+	$("#network-type").val(networkType);
+
+	networkSelector.on('change', (event) => {
 		networkType = $(event.target).val();
 		$("#requestTokens").text(`Request 1 ${networkType}`);
 		$("#network-type").val(networkType);
@@ -14,7 +26,7 @@ $(function() {
 		$("#receiver").trigger('input');
 	})
 
-	$("#receiver").on('input', (event) => {
+	$("#receiver").on('input', () => {
 		let warn = $("#address-warn");
 		let inputValue = $("#receiver").val();
 		let button = $("#requestTokens");
@@ -42,11 +54,20 @@ $(function() {
 	})
 
 	var loader = $(".loading-container");
-	$( "#faucetForm" ).submit(function( e ) {
+	$("#faucetForm" ).submit(function( e ) {
 		e.preventDefault();
+		var receiver = $("#receiver").val();
+		if(!receiver) {
+			swal("Error", "Please input your address", "error");
+			return;
+		}
+		if(!grecaptcha || grecaptcha.getResponse().length <= 0) {
+			swal("Error", "Please verify that you are not a robot", "error");
+			return;
+		}
+
 		$this = $(this);
 		loader.removeClass("hidden");
-		var receiver = $("#receiver").val();
 		$.ajax({
 			url:"/",
 			type:"POST",
