@@ -13,6 +13,7 @@ $(function() {
 	} else if(network === 'eid') {
 		networkType = 'EID'
 	}
+	$("#requestTokens").text(`Request 1 ${networkType}`);
 
 	let networkSelector = $("#network");
 	networkSelector.val(networkType);
